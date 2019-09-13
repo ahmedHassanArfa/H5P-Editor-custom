@@ -1059,6 +1059,43 @@ ns.createCopyPasteButtons = function () {
          '</div><div class="h5peditor-clearfix"></div>';
 };
 
+//ns.createSaveButtons = function () {
+//	  return '' +
+//	  			'<button type="submit" onclick="submitParent()" name="submit" class="h5p-example-url" style="background: none; border: none;" > Save </button>' +
+//	           '<button class="h5p-example-url" style="background: none; border: none;" onclick="openDialog()" title="Use In Mint">Use In Mint</button>' +
+//	           
+//	           '<script>' +
+//	           'function submitParent() {' +
+//	             'console.log(parent.document.getElementById(\'h5p-content-form\'));' +
+//	             'parent.document.getElementById(\'h5p-content-form\').submit();' +
+//	           '}' +
+//	           '</script>' +
+//	           
+//	           '<dialog id="myDialog" style="width:30%; position: fixed; z-index:100;">' +
+//	           		'<!DOCTYPE html><html><body style="text-align: center;"><h2>Add Content To Mint</h2>' +
+//	           		'<form style="display: inline-block;">' + 
+//	           		       'Content Name:<br>  <input type="text" name="Content Name" > ' + 
+//	           		        '<br>Self Name:<br><input type="text" name="Self Name" > ' + 
+//	           		        '<br>Tags:<br><textarea rows="4" cols="50"> </textarea> ' + 
+//	           		         '<br><br>' + 
+//	           		          '<input class="h5peditor-copy-button" type="submit" value="Submit">' + 
+//	           		          '</form> ' + 
+//	           		       '<button class="h5peditor-copy-button" onclick="closeDialog()" title="Close">Close</button>' +
+//	           		          '</body></html>' +
+//	           		
+//	           	'</dialog>' +	
+//	           '<script>' +
+//	           'function openDialog() {' +
+//	             'document.getElementById("myDialog").show();' + 
+//	          '}' +
+//	          'function closeDialog() {' +
+//	             'document.getElementById("myDialog").close();' + 
+//	          '}' +
+//	           '</script>' + 
+//	           '</div><div class="h5peditor-clearfix"></div>'
+//	};
+
+
 /**
  * Confirm replace if there is content selected
  *

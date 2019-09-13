@@ -180,6 +180,8 @@ ns.LibrarySelector.prototype.appendTo = function ($element) {
 
   if (window.localStorage) {
     var $buttons = ns.$(ns.createCopyPasteButtons()).appendTo($element);
+    
+//    var $Savebuttons = ns.$(ns.createSaveButtons()).appendTo($element);
 
     // Hide copy paste until library is selected:
     $buttons.addClass('hidden');

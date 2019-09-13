@@ -1,4 +1,5 @@
-sh download-core.sh 1.22.0
-sh download-and-extract-example.sh 1.22.0
-node scrape-examples.js > examples.json
-cp -r node_modules/h5p-editor/src/client h5p/editor/wp
+#sh download-core.sh 1.22.0
+#sh download-and-extract-example.sh 1.22.0
+#node scrape-examples.js > examples.json
+#cp -r node_modules/h5p-editor/src/client h5p/editor/wp
+cp -r h5p-editor-customization/* node_modules/h5p-editor

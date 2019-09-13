@@ -71,6 +71,8 @@ var ns = H5PEditor;
                 .change();
         }
 
+        // important for submit //////////////////////
+        
         $('#h5p-content-form').submit(function(event) {
             if (h5peditor !== undefined) {
                 var params = h5peditor.getParams();
@@ -102,7 +104,8 @@ var ns = H5PEditor;
                             'Content-Type': 'application/json'
                         }
                     });
-
+                    console.log(event);
+                    window.open(event.currentTarget.baseURI.replace("edit", "play"), "View",'height=400px,width=700px');
                     return event.preventDefault();
                     // TODO - Calculate & set max score
                     // $maxscore.val(h5peditor.getMaxScore(params.params));
@@ -110,6 +113,34 @@ var ns = H5PEditor;
             }
         });
 
+        
+        $('#useInMintForm').submit(function(event) {
+        	console.log(event);
+        	var url_string = window.location.href
+        	var url = new URL(url_string);
+        	var c = url.searchParams.get("spaceId");
+        	console.log(c);
+        	// send post request to create content in backend
+        	var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+        	var theUrl = "https://testapi.mintplatform.net/api/content";
+        	xmlhttp.open("POST", theUrl);
+        	xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        	xmlhttp.setRequestHeader("Authorization", "Bearer 61c0ee79-c9e2-493e-9d83-e8e5d75d20f1");
+        	xmlhttp.send(JSON.stringify({
+        	    "name":"content5",
+        	    "shelf":"interactive",
+        	    "checkSum":"aaaaaaaaaaasdasd",
+        	    "spaceId":53757,
+        	    "contentLength":4533648,
+        	    "ext":"3gp",
+        	    "tags":["ddd","ddd"],
+        	    "type":"VIDEO",
+        	    "thumbnail":""
+        	}));
+        	return event.preventDefault();
+        });
+        
+        
         // Title label
         var $title = $('#h5p-content-form #title');
         var $label = $title.prev();

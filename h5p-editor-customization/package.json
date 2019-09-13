@@ -1,0 +1,83 @@
+{
+  "_args": [
+    [
+      "h5p-editor@0.0.2",
+      "/home/mint/H5P-Demo"
+    ]
+  ],
+  "_from": "h5p-editor@0.0.2",
+  "_id": "h5p-editor@0.0.2",
+  "_inBundle": false,
+  "_integrity": "sha512-2UyG+x3M3O02nvMv6iDW6s87BDIHyMUhbcL+TloM/AwVR48vYnr4+jEvPV/+howuUIrvQziJzkkPXnCyPsSGcg==",
+  "_location": "/h5p-editor",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "version",
+    "registry": true,
+    "raw": "h5p-editor@0.0.2",
+    "name": "h5p-editor",
+    "escapedName": "h5p-editor",
+    "rawSpec": "0.0.2",
+    "saveSpec": null,
+    "fetchSpec": "0.0.2"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/h5p-editor/-/h5p-editor-0.0.2.tgz",
+  "_spec": "0.0.2",
+  "_where": "/home/mint/H5P-Demo",
+  "author": {
+    "name": "Jan Philip Schellenberg"
+  },
+  "bugs": {
+    "url": "https://github.com/Lumieducation/H5P-Editor-Nodejs-library/issues"
+  },
+  "dependencies": {
+    "adm-zip": "^0.4.13",
+    "ajv": "^6.10.2",
+    "axios": "^0.19.0",
+    "crc": "^3.8.0",
+    "escape-html": "^1.0.3",
+    "fs-extra": "^8.1.0",
+    "glob-promise": "^3.4.0",
+    "merge": "^1.2.1",
+    "mkdirp": "^0.5.1",
+    "promisepipe": "^3.0.0",
+    "qs": "^6.7.0",
+    "tmp-promise": "^2.0.2",
+    "unzipper": "^0.10.3",
+    "yauzl-promise": "^2.1.3"
+  },
+  "description": "The H5P-Editor-Nodejs-library is a port of the H5P-Editor-PHP-library for Nodejs.",
+  "devDependencies": {
+    "@types/jest": "^24.0.18",
+    "axios-mock-adapter": "^1.17.0",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-jest": "^22.15.0",
+    "jest": "^24.8.0",
+    "mockdate": "^2.0.4",
+    "shortid": "^2.2.14",
+    "stream-mock": "^2.0.5"
+  },
+  "homepage": "https://github.com/Lumieducation/H5P-Editor-Nodejs-library#readme",
+  "main": "./src/index.js",
+  "name": "h5p-editor",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lumieducation/H5P-Editor-Nodejs-library.git"
+  },
+  "scripts": {
+    "ci": "npm run lint && npm run test",
+    "clear": "rm -rf test/data/hub-content",
+    "download:content": "node scripts/download-examples.js test/data/content-type-cache/real-content-types.json test/data/hub-content",
+    "download:content-type-cache": "node scripts/update-real-content-type-cache.js",
+    "lint": "eslint ./src",
+    "postinstall": "npm run download:content-type-cache && npm run download:content",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "uninstall": "rm -rf node_modules && rm -rf test/data/hub-content && rm test/data/content-type-cache/real-content-types.json"
+  },
+  "version": "0.0.2"
+}

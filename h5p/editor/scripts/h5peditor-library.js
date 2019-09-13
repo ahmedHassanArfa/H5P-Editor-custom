@@ -144,6 +144,10 @@ ns.Library.prototype.appendTo = function ($wrapper) {
   if (window.localStorage && enableCopyAndPaste()) {
     html += ns.createCopyPasteButtons();
   }
+  
+//  if (window.localStorage && enableCopyAndPaste()) {
+//	    html += ns.createSaveButtons();
+//  }
 
   html += '<div class="libwrap"></div>';
 
