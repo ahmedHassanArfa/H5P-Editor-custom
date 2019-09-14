@@ -6,7 +6,7 @@ WORKDIR /data
 COPY . /data
 VOLUME ["/data/h5p-content"]
 
-RUN sudo apt install nodejs -y
-RUN sudo apt install npm -y
+RUN apt install nodejs -y
+RUN apt install npm -y
 RUN npm install
 RUN npm start
