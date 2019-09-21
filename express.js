@@ -118,7 +118,11 @@ const start = async () => {
 
     server.get('/edit', async (req, res) => {
         if (!req.query.contentId) {
-            res.redirect(`?contentId=${await h5pEditor.contentManager.createContentId()}`);
+        	if (Object.keys(req.query).length === 0) {
+        		res.redirect(`?contentId=${await h5pEditor.contentManager.createContentId()}`);
+        	} else {
+        		res.redirect(req.originalUrl + `&contentId=${await h5pEditor.contentManager.createContentId()}`);
+        	}
         }
         h5pEditor.render(req.query.contentId)
             .then(page => res.end(page));
@@ -166,7 +170,8 @@ const start = async () => {
     });
 
     server.post('/edit', (req, res) => {
-        h5pEditor
+    	if(req.body.params !== undefined && req.body !== undefined){
+    		h5pEditor
             .saveH5P(
                 req.query.contentId,
                 req.body.params.params,
@@ -176,6 +181,9 @@ const start = async () => {
             .then(() => {
                 res.status(200).end();
             });
+    	} else {
+    		res.end();
+    	}
     });
 
     server.post('/ajax', (req, res) => {
@@ -233,9 +241,257 @@ const start = async () => {
                 break;
         }
     });
+    
+    server.get('/download', (req, res) => {
+    	
+    	var contentPath = __dirname + '/h5p/content/' + req.query.contentId + '/';
+    	var libararyPath = __dirname + '/h5p/' + 'libraries/';
+    	console.log(contentPath);
+    	console.log(libararyPath);
+    	var zipped = getZippedFolderSync(contentPath, contentPath);
+    	console.log(zipped);
+    	fs.writeFile(req.query.contentId + ".h5p", zipped, function(err) {
+    	    if(err) {
+    	        return console.log(err);
+    	    }
+    	    res.download(req.query.contentId + '.h5p');
+    	    console.log("File saved successfully!");
+    	});
+//    	return zipped;
+//    	res.sendFile('/home/mint/Development/git/' + path.basename(__dirname) + '/zipped.h5p');
+    	
+    });
+    
+    
+//    const fs = require('fs')
+//    var path = require('path')
+    const JSZip = require('jszip-sync')
 
-    server.listen(process.env.PORT || 8050, () => {
-        console.log(`server running at http://localhost:${process.env.PORT || 8050}`);
+    function getZippedFolderSync(contentDir, libarayDir) {
+    	let contentPaths = getFilePathsRecursiveSync(contentDir)
+    	let libarayPaths = getFilePathsRecursiveSync(libarayDir)
+    	let allPaths = contentPaths.concat(libarayPaths);
+    	console.log(allPaths)
+
+    	let zip = new JSZip()
+    	let zipped = zip.sync(() => {
+    		for (let filePath of contentPaths) {
+    			let addPath = path.relative(contentDir, filePath)
+    			// let addPath = path.relative(dir, filePath) // use this instead if you don't want the source folder itself in the zip
+    			console.log(filePath)
+    			let data = fs.readFileSync(filePath)
+    			zip.file(addPath, data)
+    		}
+    		for (let filePath of libarayPaths) {
+    			let addPath = path.relative(libarayDir, filePath)
+    			// let addPath = path.relative(dir, filePath) // use this instead if you don't want the source folder itself in the zip
+    			console.log(filePath)
+    			let data = fs.readFileSync(filePath)
+    			zip.file(addPath, data)
+    		}
+    		let data = null;
+    		zip.generateAsync({type:"nodebuffer"}).then((content) => {
+    			data = content;
+    		});
+    		return data;
+    	})
+    	return zipped;
+    }
+
+    // returns a flat array of absolute paths of all files recursively contained in the dir
+    function getFilePathsRecursiveSync(dir) {
+    	var results = []
+    	list = fs.readdirSync(dir)
+    	var pending = list.length
+    	if (!pending) return results
+
+    	for (let file of list) {
+    		file = path.resolve(dir, file)
+    		let stat = fs.statSync(file)
+    		if (stat && stat.isDirectory()) {
+    			res = getFilePathsRecursiveSync(file)
+    			results = results.concat(res)
+    		} else {
+    			results.push(file)
+    		}
+    		if (!--pending) return results
+    	}
+
+    	return results
+    }
+    
+    server.get('/download/content', async (req, res) => {
+        const stream = await h5pEditor.contentManager.getContentFileStream(1439642047, '/content/beautiful-beauty-blue-414612.jpg', null);
+        stream.on("end", () => { res.end(); })
+        stream.pipe(res.type(path.basename('beautiful-beauty-blue-414612.jpg')));
+        // export 
+//        window.location.href = contentData.exportUrl;
+//        instance.triggerXAPI('downloaded');
+        
+    });
+    
+    
+    server.get('/send_content_to_mint', async (req, res) => {
+    	var querystring = require('querystring');
+        var request = require('request');
+        var fs = require("fs");
+    	
+//    	var url_string = window.location.href
+//    	var url = new URL(url_string);
+    	var spaceId = req.query.spaceId;
+    	var userId = req.query.userId;
+    	var access_token = req.query.access_token;
+    	var contentId = req.query.contentId;
+    	var name = req.query.name;
+    	var backendContentId;
+    	var contentlength;
+    	console.log(req.query);
+    	console.log(req.headers.host);
+    	
+    	 // get content as .h5p
+    	var zippedPath = null;
+    	request({
+            headers: {
+              'Authorization': 'Bearer ' + access_token
+            },
+            uri: 'http://' + req.headers.host + '/download?contentId=' + contentId,
+            method: 'GET'
+          }, function (err, response, body) {
+        	  zipped = body;
+        	  const stats = fs.statSync(__dirname + '/' + contentId + '.h5p');
+        	  contentlength = stats.size;
+        	  console.log(contentlength);
+//        	  console.log(body);
+//        	  console.log(response);
+        	  if(err) {
+				  console.log(err)
+				  res.end(err);
+				  return err;
+			  }
+        	  
+        	  
+
+          	
+          	// send post request to create content in backend
+          	var form = JSON.stringify({
+          	    "name": name,
+          	    "shelf": 'interactive',
+          	    "checkSum":"000",
+          	    "spaceId":spaceId,
+          	    "contentLength":contentlength ,
+          	    "ext":"h5p",
+          	    "tags":["ddd","ddd"],
+          	    "type":"H5P",
+          	    "thumbnail":""
+          	});
+
+          	request({
+      		    headers: {
+      		      'Content-Type': 'application/json',
+      		      'Authorization': 'Bearer ' + access_token
+      		    },
+      		    uri: 'https://testapi.mintplatform.net/api/content',
+      		    body: form,
+      		    method: 'POST'
+      		  }, function (err, response, body) {
+      			  if(err) {
+      				  console.log(err)
+      				  res.end(err);
+      				  return err;
+      			  }
+      			  if(response.statusCode !== 200) {
+      				  console.log(response)
+      				  res.end(response);
+      				  return response;
+      			  }  
+      			  console.log(body);
+      			  backendContentId = JSON.parse(body).data;
+      			  
+      			// start init upload
+      			  var taskId = null;
+      			  request({
+      		            headers: {
+      		              'Authorization': 'Bearer ' + access_token
+      		            },
+      		            uri: 'https://testapi.mintplatform.net/api/content/upload/' + Number(backendContentId),
+      		            method: 'GET'
+      		          }, function (err, response, body) {
+      		        	  if(response.statusCode !== 200) {
+      						  console.log(response.statusCode)
+      						  return response;
+      					  }
+      		        	  console.log(Number(backendContentId));
+      		        	  console.log(JSON.parse(body));
+      		        	  taskId = JSON.parse(body).data.taskId;
+      		        	  console.log(taskId);
+      		            
+      		            
+      		         // resume upload content
+      		            
+          		        	  // resume upload content
+          		        	  request({
+          			    		    headers: {
+          			    		      'Content-Type': 'multipart/form-data',
+          			    		      'Authorization': 'Bearer ' + access_token,
+          			    		      'uid': taskId
+          			    		    },
+          			    		    uri: 'https://testapi.mintplatform.net/api/content/upload',
+          			    		    method: 'POST',
+          			    		   formData: 
+          		    		          { file: 
+          		    		             { value: fs.createReadStream(__dirname + '/' + contentId + '.h5p'),
+          		    		               options: 
+          		    		                { filename: 'zipped.h5p',
+          		    		                  contentType: 'application/zip' } } }
+          			    		    
+          			    		  }, function (err, response, body) {
+          			    			  if(err) {
+          	    						  console.log(err)
+          	    						  res.end(err);
+          	    						  return err;
+          	    					  }
+//          			    			  if(response.statusCode !== 200) {
+//          			    				  console.log(response.statusCode)
+//          			    				  return response;
+//          			    			  }
+          			    			  console.log(body);
+          			    			  
+          			    			// commit upload then redirect
+          			    			  request({
+          			  		            headers: {
+          			  		              'Authorization': 'Bearer ' + access_token
+          			  		            },
+          			  		            uri: 'https://testapi.mintplatform.net/api/content/upload/commit/' + taskId,
+          			  		            method: 'GET'
+          			  		          }, function (err, response, body) {
+          			  		        	console.log(body);
+          			  		        	if(response.statusCode !== 200) {
+          			  					  console.log(response.statusCode)
+          			  					  return response;
+          			  				  }
+          			  		        	res.json(body);
+          			  		          });
+          			    			  
+          			    		  });
+          		        	  
+      		            
+      		            
+      		          });
+      			  
+      			  
+      		  });
+        	  
+        	  
+        	  
+          });	  
+    	
+    	
+    	res.redirect("https://webcore.mintplatform.net/Content/Index/" + backendContentId);
+        
+    });
+
+    server.listen(process.env.PORT || 8080, () => {
+        console.log(`server running at http://localhost:${process.env.PORT || 8080}`);
     });
 }
 
