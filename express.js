@@ -248,17 +248,37 @@ const start = async () => {
     	var libararyPath = __dirname + '/h5p/' + 'libraries/';
     	console.log(contentPath);
     	console.log(libararyPath);
-    	var zipped = getZippedFolderSync(contentPath, contentPath);
-    	console.log(zipped);
-    	fs.writeFile(req.query.contentId + ".h5p", zipped, function(err) {
-    	    if(err) {
-    	        return console.log(err);
+    	
+    	const zipFolder = require('zip-a-folder');
+    	var fsextra = require("fs-extra");
+    	fsextra.copy(libararyPath, contentPath, function (err) {
+    	    if (err){
+    	        console.log('An error occured while copying the folder.')
+    	        return console.error(err)
     	    }
-    	    res.download(req.query.contentId + '.h5p');
-    	    console.log("File saved successfully!");
+    	    console.log('Copy completed!')
+    	    zipFolder.zipFolder(contentPath, __dirname + '/' + req.query.contentId + '.h5p', function(err) {
+                if(err) {
+                    console.log('Something went wrong!', err);
+                }
+                res.end();
+            });
     	});
-//    	return zipped;
-//    	res.sendFile('/home/mint/Development/git/' + path.basename(__dirname) + '/zipped.h5p');
+    	
+    	
+//    	var zipped =  getZippedFolderSync(contentPath, contentPath);
+//		console.log(zipped);
+//    	fs.writeFile(req.query.contentId + ".h5p", zipped, function(err) {
+//    	    if(err) {
+//    	        return console.log(err);
+//    	    }
+//    	    res.download(req.query.contentId + '.h5p');
+//    	    console.log("File saved successfully!");
+//	})
+//        	return zipped;
+//        	res.sendFile('/home/mint/Development/git/' + path.basename(__dirname) + '/zipped.h5p');
+//			location.href="data:application/zip;base64,"+content;
+    	
     	
     });
     
@@ -287,14 +307,19 @@ const start = async () => {
     			// let addPath = path.relative(dir, filePath) // use this instead if you don't want the source folder itself in the zip
     			console.log(filePath)
     			let data = fs.readFileSync(filePath)
+    			console.log('done read file');
     			zip.file(addPath, data)
+    			console.log('done file add to zip');
     		}
     		let data = null;
     		zip.generateAsync({type:"nodebuffer"}).then((content) => {
     			data = content;
+    			console.log('after commpress');
+    			console.log(data)
     		});
     		return data;
     	})
+    	console.log('final commpress');
     	return zipped;
     }
 
@@ -365,9 +390,14 @@ const start = async () => {
 //        	  console.log(response);
         	  if(err) {
 				  console.log(err)
-				  res.end(err);
+				  res.end();
 				  return err;
 			  }
+        	  if(response.statusCode !== 200) {
+  				  console.log(response)
+  				  res.end();
+  				  return response;
+  			  }  
         	  
         	  
 
@@ -396,12 +426,12 @@ const start = async () => {
       		  }, function (err, response, body) {
       			  if(err) {
       				  console.log(err)
-      				  res.end(err);
+      				  res.end();
       				  return err;
       			  }
       			  if(response.statusCode !== 200) {
       				  console.log(response)
-      				  res.end(response);
+      				  res.end();
       				  return response;
       			  }  
       			  console.log(body);
@@ -416,8 +446,13 @@ const start = async () => {
       		            uri: 'https://testapi.mintplatform.net/api/content/upload/' + Number(backendContentId),
       		            method: 'GET'
       		          }, function (err, response, body) {
+      		        	if(err) {
+    						  console.log(err)
+    						  res.end();
+    						  return err;
+    					  }
       		        	  if(response.statusCode !== 200) {
-      						  console.log(response.statusCode)
+      						  console.log(response.statusCode);
       						  return response;
       					  }
       		        	  console.log(Number(backendContentId));
@@ -447,9 +482,14 @@ const start = async () => {
           			    		  }, function (err, response, body) {
           			    			  if(err) {
           	    						  console.log(err)
-          	    						  res.end(err);
+          	    						  res.end();
           	    						  return err;
           	    					  }
+          			    			if(response.statusCode !== 200) {
+          		      				  console.log(response)
+          		      				  res.end();
+          		      				  return response;
+          		      			  }  
 //          			    			  if(response.statusCode !== 200) {
 //          			    				  console.log(response.statusCode)
 //          			    				  return response;
@@ -465,6 +505,11 @@ const start = async () => {
           			  		            method: 'GET'
           			  		          }, function (err, response, body) {
           			  		        	console.log(body);
+          			  		        if(err) {
+        	    						  console.log(err)
+        	    						  res.end();
+        	    						  return err;
+        	    					  }
           			  		        	if(response.statusCode !== 200) {
           			  					  console.log(response.statusCode)
           			  					  return response;
@@ -486,7 +531,7 @@ const start = async () => {
           });	  
     	
     	
-    	res.redirect("https://webcore.mintplatform.net/Content/Index/" + backendContentId);
+//    	res.redirect("https://webcore.mintplatform.net/Content/Index/" + backendContentId);
         
     });
 
