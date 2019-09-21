@@ -115,44 +115,7 @@ var ns = H5PEditor;
         });
 
         
-        $('#useInMintForm').submit(function(event) {
-        	if (h5peditor !== undefined) {
-        		// Validate mandatory main title. Prevent submitting if that's not set.
-                // Deliberatly doing it after getParams(), so that any other validation
-                // problems are also revealed
-                if (!h5peditor.isMainTitleSet()) {
-                	alert("enter the title");
-                	return event.preventDefault();
-                }
-        	}
-                    
-        	console.log($("input:first").val());
-        	var url_string = window.location.href
-        	var url = new URL(url_string);
-        	var spaceId = url.searchParams.get("spaceId");
-        	var userId = url.searchParams.get("userId");
-        	var access_token = url.searchParams.get("access_token");
-        	var contentId = url.searchParams.get("contentId");
-        	var backendContentId;
-            
-        	// get send_content_to_mint
-	    	var xhttp = new XMLHttpRequest(); 
-	    	var url = window.location.origin + "/send_content_to_mint?contentId=" + contentId +
-	    	"&spaceId=" + spaceId + "&access_token=" + access_token + "&name=" + $("input:first").val() + "&userId=" + userId;
-	    	console.log(url);
-	    	xhttp.open("GET", url);
-	    	xhttp.send();
-	    	xhttp.onreadystatechange = function() {
-        	    if (this.status !== 200) {
-        	    	console.log(this.responseText);
-        	    	alert(this.responseText);
-        	    }
-//        	    backendContentId = this.responseText;
-        	    window.location = "https://webcore.mintplatform.net/Space/View/" + spaceId;
-	    	}
-        	
-        	return event.preventDefault();
-        });
+
         
         
         // Title label
